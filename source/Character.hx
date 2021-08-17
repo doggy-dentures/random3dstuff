@@ -3,6 +3,9 @@ package;
 import flixel.FlxSprite;
 import flixel.animation.FlxBaseAnimation;
 import flixel.graphics.frames.FlxAtlasFrames;
+import away3d.core.base.data.Face;
+import flixel.tweens.FlxTween;
+import away3d.errors.AbstractMethodError;
 
 using StringTools;
 
@@ -18,6 +21,26 @@ class Character extends FlxSprite
 
 	public var canAutoAnim:Bool = true;
 
+	public var isModel:Bool = false;
+	public var beganLoading:Bool = false;
+	public var modelName:String;
+	public var modelScale:Float;
+	public var modelOrigBPM:Int;
+	public var model:ModelThing;
+
+	public var spinYaw:Bool = false;
+	public var spinYawVal:Int = 0;
+	public var spinPitch:Bool = false;
+	public var spinPitchVal:Int = 0;
+	public var spinRoll:Bool = false;
+	public var spinRollVal:Int = 0;
+	public var yTween:FlxTween;
+	public var xTween:FlxTween;
+	public var originalY:Float = -1;
+	public var originalX:Float = -1;
+	public var circleTween:FlxTween;
+	public var initYaw:Float = 0;
+
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		animOffsets = new Map<String, Array<Dynamic>>();
@@ -31,6 +54,20 @@ class Character extends FlxSprite
 
 		switch (curCharacter)
 		{
+			case 'monkey':
+				// DD: Okay, don't load models here cuz the engine will crash with more than one model
+
+				// model = new ModelThing("monkey", Main.modelView, 100, 80);
+				// model = new ModelThing("boyfriend", Main.modelView, 1.5, 80);
+				modelName = "monkey";
+				modelScale = 90;
+				modelOrigBPM = 75;
+				isModel = true;
+				loadGraphicFromSprite(Main.modelView.sprite);
+				scale.x = scale.y = 1.4;
+				initYaw = 0;
+				updateHitbox();
+
 			case 'gf':
 				// GIRLFRIEND CODE
 				frames = Paths.getSparrowAtlas("GF_assets");
@@ -490,7 +527,7 @@ class Character extends FlxSprite
 			flipX = !flipX;
 
 			// Doesn't flip for BF, since his are already in the right place???
-			if (!curCharacter.startsWith('bf'))
+			if (!isModel && !curCharacter.startsWith('bf'))
 			{
 				// var animArray
 				var oldRight = animation.getByName('singRIGHT').frames;
@@ -508,14 +545,30 @@ class Character extends FlxSprite
 		}
 
 		animation.finishCallback = animationEnd;
-
 	}
 
 	override function update(elapsed:Float)
 	{
-		if (!isPlayer)
+		if (!isPlayer && !isModel)
 		{
 			if (animation.curAnim.name.startsWith('sing'))
+			{
+				holdTimer += elapsed;
+			}
+
+			var dadVar:Float = 4;
+
+			if (curCharacter == 'dad')
+				dadVar = 6.1;
+			if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
+			{
+				idleEnd();
+				holdTimer = 0;
+			}
+		}
+		else if (!isPlayer && isModel)
+		{
+			if (model.currentAnim.startsWith('sing'))
 			{
 				holdTimer += elapsed;
 			}
@@ -539,6 +592,24 @@ class Character extends FlxSprite
 		}
 
 		super.update(elapsed);
+
+		if (isModel)
+		{
+			if (spinYaw)
+			{
+				model.addYaw(elapsed * spinYawVal);
+			}
+
+			if (spinPitch)
+			{
+				model.addPitch(elapsed * spinPitchVal);
+			}
+
+			if (spinRoll)
+			{
+				model.addRoll(elapsed * spinRollVal);
+			}
+		}
 	}
 
 	private var danced:Bool = false;
@@ -571,7 +642,7 @@ class Character extends FlxSprite
 					else
 						playAnim('danceLeft', true);
 				default:
-					if(holdTimer == 0)
+					if (holdTimer == 0 && !isModel)
 						playAnim('idle', true);
 			}
 		}
@@ -579,7 +650,7 @@ class Character extends FlxSprite
 
 	public function idleEnd(?ignoreDebug:Bool = false)
 	{
-		if (!debugMode || ignoreDebug)
+		if (!isModel && (!debugMode || ignoreDebug))
 		{
 			switch (curCharacter)
 			{
@@ -589,34 +660,45 @@ class Character extends FlxSprite
 					playAnim('idle', true, false, animation.getByName('idle').numFrames - 1);
 			}
 		}
+		else if (isModel && (!debugMode || ignoreDebug))
+		{
+			playAnim('idle');
+		}
 	}
 
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
 	{
-		animation.play(AnimName, Force, Reversed, Frame);
-
-		var daOffset = animOffsets.get(animation.curAnim.name);
-		if (animOffsets.exists(animation.curAnim.name))
+		if (isModel)
 		{
-			offset.set(daOffset[0], daOffset[1]);
+			model.playAnim(AnimName);
 		}
 		else
-			offset.set(0, 0);
-
-		if (curCharacter == 'gf')
 		{
-			if (AnimName == 'singLEFT')
-			{
-				danced = true;
-			}
-			else if (AnimName == 'singRIGHT')
-			{
-				danced = false;
-			}
+			animation.play(AnimName, Force, Reversed, Frame);
 
-			if (AnimName == 'singUP' || AnimName == 'singDOWN')
+			var daOffset = animOffsets.get(animation.curAnim.name);
+			if (animOffsets.exists(animation.curAnim.name))
 			{
-				danced = !danced;
+				offset.set(daOffset[0], daOffset[1]);
+			}
+			else
+				offset.set(0, 0);
+
+			if (curCharacter == 'gf')
+			{
+				if (AnimName == 'singLEFT')
+				{
+					danced = true;
+				}
+				else if (AnimName == 'singRIGHT')
+				{
+					danced = false;
+				}
+
+				if (AnimName == 'singUP' || AnimName == 'singDOWN')
+				{
+					danced = !danced;
+				}
 			}
 		}
 	}
@@ -626,11 +708,13 @@ class Character extends FlxSprite
 		animOffsets[name] = [x, y];
 	}
 
-	function animationEnd(name:String){
-
-		switch(curCharacter){
+	function animationEnd(name:String)
+	{
+		switch (curCharacter)
+		{
 			case "mom-car":
-				switch(name){
+				switch (name)
+				{
 					case "idle":
 						playAnim(name, false, false, 8);
 					case "singUP":
@@ -644,7 +728,8 @@ class Character extends FlxSprite
 				}
 
 			case "bf-car":
-				switch(name){
+				switch (name)
+				{
 					case "idle":
 						playAnim(name, false, false, 8);
 					case "singUP":
@@ -658,7 +743,8 @@ class Character extends FlxSprite
 				}
 
 			case "monster-christmas" | "monster":
-				switch(name){
+				switch (name)
+				{
 					case "idle":
 						playAnim(name, false, false, 10);
 					case "singUP":
@@ -670,8 +756,6 @@ class Character extends FlxSprite
 					case "singRIGHT":
 						playAnim(name, false, false, 6);
 				}
-
 		}
-
 	}
 }

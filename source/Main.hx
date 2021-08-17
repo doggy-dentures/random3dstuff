@@ -23,6 +23,8 @@ class Main extends Sprite
 	public static var skipgraphics:Bool = Sys.args().contains("-skipgraphics");
 	public static var flippymode:Bool = Sys.args().contains("-flippymode");
 
+	public static var modelView:ModelView;
+
 	public function new()
 	{
 		super();
@@ -68,6 +70,8 @@ class Main extends Sprite
 		trace("skipcharacters: " + skipcharacters);
 		trace("skipgraphics: " + skipgraphics);
 		trace("flippymode: " + flippymode);
+
+		modelView = new ModelView();
 
 	}
 }

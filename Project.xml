@@ -43,6 +43,7 @@
 	<assets path="assets/images" />
 	<assets path="assets/data" />
 	<assets path="assets/videos" />
+	<assets path="assets/models" />
 	<!-- <template path='mods' /> -->
 	
 	<!-- <library name="noPreload" preload='false'/> -->
@@ -64,6 +65,7 @@
 		<library name="music" 	preload="true" />
 		<library name="images"  preload="true" />
 		<library name="videos"  preload="true" />
+		<library name="models"  preload="true" />
 	</section>
 	
 	<section if="NO_PRELOAD_ALL">
@@ -72,6 +74,7 @@
 		<library name="music" 	preload="false" />
 		<library name="images"  preload="false" />
 		<library name="videos"  preload="false" />
+		<library name="models"  preload="false" />
 	</section>
 
 	<!-- NOTE FOR FUTURE SELF SINCE FONTS ARE ALWAYS FUCKY 
@@ -96,6 +99,8 @@
 	<!--haxelib name="polymod"/-->
 	<haxelib name="actuate" />
 	<haxelib name="extension-webm" if="desktop" />
+
+	<haxelib name="away3d"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
