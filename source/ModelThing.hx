@@ -1,5 +1,6 @@
 package;
 
+import away3d.animators.nodes.VertexClipNode;
 import away3d.tools.utils.Bounds;
 import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
@@ -44,7 +45,7 @@ class ModelThing
 
 	public var fullyLoaded:Bool = false;
 
-	private var animBPM:Int;
+	private var animSpeed:Map<String, Float>;
 
 	public var currentAnim:String = "";
 
@@ -52,8 +53,14 @@ class ModelThing
 	public var initPitch:Float;
 	public var initRoll:Float;
 
-	public function new(md2Name:String, _modelView:ModelView, _scale:Float = 1, _animBPM:Int = 100, _initYaw:Float = 0, _initPitch:Float = 0,
-			_initRoll:Float = 0, alpha:Float = 1.0, shimmer:Bool = false)
+	public var xOffset:Float = 0;
+	public var yOffset:Float = 0;
+	public var zOffset:Float = 0;
+
+	public var noLoopList:Array<String>;
+
+	public function new(md2Name:String, _modelView:ModelView, _scale:Float = 1, _animSpeed:Map<String, Float> = null, _initYaw:Float = 0, _initPitch:Float = 0,
+			_initRoll:Float = 0, alpha:Float = 1.0, _initX:Float = 0, _initY:Float = 0, _initZ:Float = 0, list:Array<String>)
 	{
 		if (!Assets.exists('assets/models/' + md2Name + '.md2'))
 		{
@@ -79,20 +86,27 @@ class ModelThing
 		modelMaterial.ambient = 1;
 		// modelMaterial.shadowMethod = modelView.shadowMapMethod;
 		modelMaterial.alpha = alpha;
-		if (shimmer)
-		{
-			var subsurfaceMethod = new SubsurfaceScatteringDiffuseMethod(2048, 2);
-			subsurfaceMethod.scatterColor = 0xc925e6;
-			subsurfaceMethod.scattering = 10;
-			subsurfaceMethod.translucency = 10;
-			modelMaterial.diffuseMethod = subsurfaceMethod;
-		}
+		// if (shimmer)
+		// {
+		// 	var subsurfaceMethod = new SubsurfaceScatteringDiffuseMethod(2048, 2);
+		// 	subsurfaceMethod.scatterColor = 0xc925e6;
+		// 	subsurfaceMethod.scattering = 10;
+		// 	subsurfaceMethod.translucency = 10;
+		// 	modelMaterial.diffuseMethod = subsurfaceMethod;
+		// }
 
 		scale = _scale;
-		animBPM = _animBPM;
+		if (_animSpeed == null)
+			animSpeed = ["default" => 1.0];
+		else
+			animSpeed = _animSpeed;
 		initYaw = _initYaw;
 		initPitch = _initPitch;
 		initRoll = _initRoll;
+		xOffset = _initX;
+		yOffset = _initY;
+		zOffset = _initZ;
+		noLoopList = list;
 		modelView.cameraController.panAngle = 90;
 		modelView.cameraController.tiltAngle = 0;
 	}
@@ -109,6 +123,12 @@ class ModelThing
 			mesh.pitch(initPitch);
 			mesh.roll(initRoll);
 		}
+		else if (event.asset.assetType == Asset3DType.ANIMATION_NODE)
+		{
+			var node:VertexClipNode = cast(event.asset, VertexClipNode);
+			if (noLoopList.contains(node.name))
+				node.looping = false;
+		}
 		else if (event.asset.assetType == Asset3DType.ANIMATION_SET)
 		{
 			animationSet = cast(event.asset, VertexAnimationSet);
@@ -118,11 +138,11 @@ class ModelThing
 	private function onResourceComplete(event:LoaderEvent):Void
 	{
 		vertexAnimator = new VertexAnimator(animationSet);
-		vertexAnimator.playbackSpeed = Conductor.bpm / animBPM;
+		//vertexAnimator.playbackSpeed = animSpeed["default"];
 		mesh.animator = vertexAnimator;
 
 		fullyLoaded = true;
-		render();
+		render(xOffset, yOffset, zOffset);
 	}
 
 	public function render(xPos:Float = 0, yPos:Float = 0, zPos:Float = 0):Void
@@ -145,6 +165,13 @@ class ModelThing
 			{
 				if (force || currentAnim != anim)
 				{
+					var newSpeed:Float = 1.0;
+					if (animSpeed.exists(anim))
+						newSpeed = animSpeed[anim];
+					else
+						newSpeed = animSpeed["default"];
+					// trace("ya new speed: " + newSpeed);
+					vertexAnimator.playbackSpeed = newSpeed;
 					vertexAnimator.play(anim, null, frame);
 					currentAnim = anim;
 				}

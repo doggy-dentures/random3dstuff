@@ -57,11 +57,9 @@ class ModelView
 	{
 		//DD: Setup 3d viewing object thing
 		view = new View3D();
-		//DD: Small resolution cause this is all inefficient and laggy
-		//view.width = FlxG.stage.stageWidth/2;
-		//view.height = FlxG.stage.stageHeight/2;
-		view.width = 450;
-		view.height = 450;
+
+		view.width = 600;
+		view.height = 720;
 		
 		FlxG.addChildBelowMouse(view);
 

@@ -1,5 +1,8 @@
 package;
 
+import flixel.util.FlxDestroyUtil;
+import away3d.events.AnimationStateEvent;
+import away3d.library.Asset3DLibrary;
 import flixel.FlxSprite;
 import flixel.animation.FlxBaseAnimation;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -24,8 +27,8 @@ class Character extends FlxSprite
 	public var isModel:Bool = false;
 	public var beganLoading:Bool = false;
 	public var modelName:String;
-	public var modelScale:Float;
-	public var modelOrigBPM:Int;
+	public var modelScale:Float = 1;
+	public var modelSpeed:Map<String, Float> = new Map<String, Float>();
 	public var model:ModelThing;
 
 	public var spinYaw:Bool = false;
@@ -40,6 +43,12 @@ class Character extends FlxSprite
 	public var originalX:Float = -1;
 	public var circleTween:FlxTween;
 	public var initYaw:Float = 0;
+	public var initPitch:Float = 0;
+	public var initRoll:Float = 0;
+	public var initX:Float = 0;
+	public var initY:Float = 0;
+	public var initZ:Float = 0;
+	public var noLoopList:Array<String> = [];
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -54,19 +63,41 @@ class Character extends FlxSprite
 
 		switch (curCharacter)
 		{
-			case 'monkey':
-				// DD: Okay, don't load models here cuz the engine will crash with more than one model
-
-				// model = new ModelThing("monkey", Main.modelView, 100, 80);
-				// model = new ModelThing("boyfriend", Main.modelView, 1.5, 80);
-				modelName = "monkey";
-				modelScale = 90;
-				modelOrigBPM = 75;
+			case 'steve':
+				modelName = "steve";
+				modelScale = 30;
+				modelSpeed = ["default" => 126/75];
+				//modelSpeed = 126 / 75;
 				isModel = true;
 				loadGraphicFromSprite(Main.modelView.sprite);
-				scale.x = scale.y = 1.4;
-				initYaw = 0;
+				// scale.x = scale.y = 1.4;
+				initYaw = -45;
+				initY = -28;
 				updateHitbox();
+				noLoopList = ["idle"];
+
+			// case 'crash':
+			// 	modelName = "crash";
+			// 	modelScale = 1;
+			// 	modelSpeed = 2;
+			// 	isModel = true;
+			// 	loadGraphicFromSprite(Main.modelView.sprite);
+			// 	// scale.x = scale.y = 1.4;
+			// 	initYaw = -45;
+			// 	initY = -80;
+			// 	updateHitbox();
+			// 	noLoopList = ["idle", "singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
+
+			case 'doll':
+				modelName = "doll";
+				modelScale = 15;
+				modelSpeed = ["default" => 1.66, "idle" => 1];
+				isModel = true;
+				loadGraphicFromSprite(Main.modelView.sprite);
+				// scale.x = scale.y = 1.4;
+				initYaw = -45;
+				updateHitbox();
+				noLoopList = ["singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
 
 			case 'gf':
 				// GIRLFRIEND CODE
@@ -642,8 +673,22 @@ class Character extends FlxSprite
 					else
 						playAnim('danceLeft', true);
 				default:
-					if (holdTimer == 0 && !isModel)
+					if (holdTimer == 0)
+					{
+						if (isModel && model == null)
+						{
+							trace("NO DANCE - NO MODEL");
+							return;
+						}
+						if (isModel && !model.fullyLoaded)
+						{
+							trace("NO DANCE - NO FULLY LOAD");
+							return;
+						}
+						if (isModel && !noLoopList.contains('idle'))
+							return;
 						playAnim('idle', true);
+					}
 			}
 		}
 	}
@@ -670,7 +715,7 @@ class Character extends FlxSprite
 	{
 		if (isModel)
 		{
-			model.playAnim(AnimName);
+			model.playAnim(AnimName, Force, Frame);
 		}
 		else
 		{
@@ -757,5 +802,13 @@ class Character extends FlxSprite
 						playAnim(name, false, false, 6);
 				}
 		}
+	}
+
+	override public function destroy()
+	{
+		FlxDestroyUtil.destroy(yTween);
+		FlxDestroyUtil.destroy(xTween);
+		FlxDestroyUtil.destroy(circleTween);
+		super.destroy();
 	}
 }

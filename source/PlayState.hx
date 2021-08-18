@@ -80,6 +80,8 @@ class PlayState extends MusicBeatState
 	public static var schoolSongs:Array<String>;
 	public static var schoolScared:Array<String>;
 	public static var evilSchoolSongs:Array<String>;
+	public static var minecraftSongs:Array<String>;
+	public static var checkerSongs:Array<String>;
 
 	private var camFocus:String = "";
 	private var camTween:FlxTween;
@@ -237,6 +239,8 @@ class PlayState extends MusicBeatState
 		schoolSongs = ["senpai", "roses"];
 		schoolScared = ["roses"];
 		evilSchoolSongs = ["thorns"];
+		minecraftSongs = ["dont-mine-at-night"];
+		checkerSongs = ["super-sonic-racing"];
 
 		canHit = !(Config.ghostTapType > 0);
 		noMissCount = 0;
@@ -301,6 +305,14 @@ class PlayState extends MusicBeatState
 			else if (evilSchoolSongs.contains(SONG.song.toLowerCase()))
 			{
 				stageCheck = 'schoolEvil';
+			}
+			else if (minecraftSongs.contains(SONG.song.toLowerCase()))
+			{
+				stageCheck = 'minecraft';
+			}
+			else if (checkerSongs.contains(SONG.song.toLowerCase()))
+			{
+				stageCheck = 'checker';
 			}
 
 			SONG.stage = stageCheck;
@@ -604,6 +616,32 @@ class PlayState extends MusicBeatState
 				add(waveSpriteFG);
 			 */
 		}
+		else if (stageCheck == 'minecraft')
+		{
+			defaultCamZoom = 0.9;
+			curStage = 'minecraft';
+			var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("flatland"));
+			// bg.setGraphicSize(Std.int(bg.width * 2.5));
+			// bg.updateHitbox();
+			bg.antialiasing = true;
+			bg.scrollFactor.set(0.9, 0.9);
+			bg.active = false;
+			bg.screenCenter(XY);
+			add(bg);
+		}
+		else if (stageCheck == 'checker')
+		{
+			defaultCamZoom = 0.66;
+			curStage = 'checker';
+			var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("redfloor"));
+			// bg.setGraphicSize(Std.int(bg.width * 2.5));
+			// bg.updateHitbox();
+			bg.antialiasing = true;
+			bg.scrollFactor.set(0.66, 0.66);
+			bg.active = false;
+			bg.screenCenter(XY);
+			add(bg);
+		}
 		else
 		{
 			defaultCamZoom = 0.9;
@@ -736,6 +774,10 @@ class PlayState extends MusicBeatState
 				dad.x -= 150;
 				dad.y += 100;
 				camPos.set(dad.getGraphicMidpoint().x + 300, dad.getGraphicMidpoint().y);
+			case 'steve':
+				dad.y += 80;
+			case 'doll':
+				dad.yTween = FlxTween.tween(dad, {'y': dad.y+100}, 1, {type:PINGPONG});
 		}
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
@@ -774,6 +816,10 @@ class PlayState extends MusicBeatState
 				boyfriend.y += 220;
 				gf.x += 180;
 				gf.y += 300;
+			case 'minecraft':
+				gf.y -= 150;
+				dad.y -= 150;
+				boyfriend.y -= 150;
 		}
 
 		add(gf);
@@ -1487,7 +1533,8 @@ class PlayState extends MusicBeatState
 		if (dad.isModel && !dad.beganLoading)
 		{
 			dad.beganLoading = true;
-			dad.model = new ModelThing(dad.modelName, Main.modelView, dad.modelScale, dad.modelOrigBPM, dad.initYaw);
+			dad.model = new ModelThing(dad.modelName, Main.modelView, dad.modelScale, dad.modelSpeed, dad.initYaw, dad.initPitch, dad.initRoll, 1, dad.initX,
+				dad.initY, dad.initZ, dad.noLoopList);
 			return;
 		}
 		else if (dad.isModel && dad.beganLoading && !dad.model.fullyLoaded)
@@ -1784,7 +1831,7 @@ class PlayState extends MusicBeatState
 
 					// trace("DA ALT THO?: " + SONG.notes[Math.floor(curStep / 16)].altAnim);
 
-					if (dad.canAutoAnim)
+					if (dad.canAutoAnim && (!dad.isModel || !daNote.isSustainNote))
 					{
 						switch (Math.abs(daNote.noteData))
 						{
@@ -2901,8 +2948,16 @@ class PlayState extends MusicBeatState
 
 			// Dad doesnt interupt his own notes
 			if (SONG.notes[Math.floor(curStep / 16)].mustHitSection)
+			{
 				if (dadBeats.contains(curBeat % 4) && dad.canAutoAnim)
 					dad.dance();
+			}
+			else if (!SONG.notes[Math.floor(curStep / 16)].mustHitSection)
+			{
+				if (dadBeats.contains(curBeat % 4) && dad.canAutoAnim)
+					if (dad.isModel && dad.model != null && dad.model.currentAnim.contains('idle'))
+						dad.dance();
+			}
 		}
 		else
 		{
@@ -3081,5 +3136,18 @@ class PlayState extends MusicBeatState
 		}
 
 		camTween = FlxTween.tween(camFollow, {x: followX, y: followY}, 1.95, {ease: FlxEase.quintOut});
+	}
+
+	override public function destroy()
+	{
+		if (dad.model != null)
+			dad.model.begoneEventListeners();
+
+		Main.modelView.clear();
+		for (i in 0...Main.modelView.addedModels.length)
+			Main.modelView.addedModels[i].destroy();
+		Main.modelView.addedModels.resize(0);
+
+		super.destroy();
 	}
 }

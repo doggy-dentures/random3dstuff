@@ -16,8 +16,10 @@ class Main extends Sprite
 		var webmHandle:WebmHandler;
 	#end
 
-	public static var novid:Bool = Sys.args().contains("-novid");
-	public static var nopreload:Bool = Sys.args().contains("-nopreload");
+	//public static var novid:Bool = Sys.args().contains("-novid");
+	public static var novid:Bool = true;
+	// public static var nopreload:Bool = Sys.args().contains("-nopreload");
+	public static var nopreload:Bool = true;
 	public static var skipsound:Bool = Sys.args().contains("-skipsound");
 	public static var skipcharacters:Bool = Sys.args().contains("-skipcharacters");
 	public static var skipgraphics:Bool = Sys.args().contains("-skipgraphics");

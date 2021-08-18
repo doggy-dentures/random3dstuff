@@ -16,3 +16,6 @@ senpai
 senpai-angry
 spirit
 monkey
+steve
+crash
+doll
