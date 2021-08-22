@@ -102,6 +102,8 @@
 
 	<haxelib name="away3d"/>
 
+	<haxelib name="hxcpp-debug-server" if="debug"/>
+
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
 

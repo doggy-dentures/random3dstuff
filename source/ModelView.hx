@@ -41,7 +41,7 @@ class ModelView
 	// #end
 
 	//DD: Light objects
-	private var light:DirectionalLight;
+	public var light:DirectionalLight;
 
 	public var lightPicker:StaticLightPicker;
 	public var shadowMapMethod:FilteredShadowMapMethod;
@@ -58,7 +58,7 @@ class ModelView
 		//DD: Setup 3d viewing object thing
 		view = new View3D();
 
-		view.width = 600;
+		view.width = 720;
 		view.height = 720;
 		
 		FlxG.addChildBelowMouse(view);
@@ -68,7 +68,6 @@ class ModelView
 		cameraController.lookAtPosition = _lookAtPosition;
 
 		light = new DirectionalLight(-0.5, -1, -1);
-		light.ambient = 0.4;
 		lightPicker = new StaticLightPicker([light]);
 		view.scene.addChild(light);
 

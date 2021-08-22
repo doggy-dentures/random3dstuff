@@ -82,6 +82,7 @@ class PlayState extends MusicBeatState
 	public static var evilSchoolSongs:Array<String>;
 	public static var minecraftSongs:Array<String>;
 	public static var checkerSongs:Array<String>;
+	public static var crashSongs:Array<String>;
 
 	private var camFocus:String = "";
 	private var camTween:FlxTween;
@@ -241,6 +242,7 @@ class PlayState extends MusicBeatState
 		evilSchoolSongs = ["thorns"];
 		minecraftSongs = ["dont-mine-at-night"];
 		checkerSongs = ["super-sonic-racing"];
+		crashSongs = ["rockslide-rumble"];
 
 		canHit = !(Config.ghostTapType > 0);
 		noMissCount = 0;
@@ -313,6 +315,10 @@ class PlayState extends MusicBeatState
 			else if (checkerSongs.contains(SONG.song.toLowerCase()))
 			{
 				stageCheck = 'checker';
+			}
+			else if (crashSongs.contains(SONG.song.toLowerCase()))
+			{
+				stageCheck = 'crashStage';
 			}
 
 			SONG.stage = stageCheck;
@@ -637,7 +643,17 @@ class PlayState extends MusicBeatState
 			// bg.setGraphicSize(Std.int(bg.width * 2.5));
 			// bg.updateHitbox();
 			bg.antialiasing = true;
-			bg.scrollFactor.set(0.66, 0.66);
+			// bg.scrollFactor.set(0.66, 0.66);
+			bg.active = false;
+			bg.screenCenter(XY);
+			add(bg);
+		}
+		else if (stageCheck == 'crashStage')
+		{
+			defaultCamZoom = 0.8;
+			curStage = 'crashStage';
+			var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("rockslide"));
+			bg.antialiasing = true;
 			bg.active = false;
 			bg.screenCenter(XY);
 			add(bg);
@@ -777,7 +793,9 @@ class PlayState extends MusicBeatState
 			case 'steve':
 				dad.y += 80;
 			case 'doll':
-				dad.yTween = FlxTween.tween(dad, {'y': dad.y+100}, 1, {type:PINGPONG});
+				dad.yTween = FlxTween.tween(dad, {'y': dad.y + 100}, 1, {type: PINGPONG});
+			case 'crash':
+				dad.y += 80;
 		}
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
@@ -820,6 +838,13 @@ class PlayState extends MusicBeatState
 				gf.y -= 150;
 				dad.y -= 150;
 				boyfriend.y -= 150;
+			case 'crashStage':
+				gf.y += 100;
+				dad.y += 100;
+				boyfriend.y += 100;
+				gf.x -= 50;
+				dad.x -= 50;
+				boyfriend.x -= 50;
 		}
 
 		add(gf);
@@ -1533,8 +1558,8 @@ class PlayState extends MusicBeatState
 		if (dad.isModel && !dad.beganLoading)
 		{
 			dad.beganLoading = true;
-			dad.model = new ModelThing(dad.modelName, Main.modelView, dad.modelScale, dad.modelSpeed, dad.initYaw, dad.initPitch, dad.initRoll, 1, dad.initX,
-				dad.initY, dad.initZ, dad.noLoopList);
+			dad.model = new ModelThing(dad.modelType, dad.modelName, Main.modelView, dad.modelScale, dad.modelSpeed, dad.initYaw, dad.initPitch, dad.initRoll, 1, dad.initX,
+				dad.initY, dad.initZ, dad.noLoopList, dad.modelGloss, dad.modelSpecular);
 			return;
 		}
 		else if (dad.isModel && dad.beganLoading && !dad.model.fullyLoaded)
@@ -1894,53 +1919,53 @@ class PlayState extends MusicBeatState
 				}
 
 				// Guitar Hero Type Held Notes
-				if (daNote.isSustainNote && daNote.mustPress)
-				{
-					if (daNote.prevNote.tooLate)
-					{
-						daNote.tooLate = true;
-						daNote.destroy();
-					}
+				// if (daNote.isSustainNote && daNote.mustPress)
+				// {
+				// 	if (daNote.prevNote.tooLate)
+				// 	{
+				// 		daNote.tooLate = true;
+				// 		daNote.destroy();
+				// 	}
 
-					if (daNote.prevNote.wasGoodHit)
-					{
-						switch (daNote.noteData)
-						{
-							case 0:
-								if (!leftHold)
-								{
-									noteMiss(0, 0.03, true, true);
-									vocals.volume = 0;
-									daNote.tooLate = true;
-									daNote.destroy();
-								}
-							case 1:
-								if (!downHold)
-								{
-									noteMiss(1, 0.03, true, true);
-									vocals.volume = 0;
-									daNote.tooLate = true;
-									daNote.destroy();
-								}
-							case 2:
-								if (!upHold)
-								{
-									noteMiss(2, 0.03, true, true);
-									vocals.volume = 0;
-									daNote.tooLate = true;
-									daNote.destroy();
-								}
-							case 3:
-								if (!rightHold)
-								{
-									noteMiss(3, 0.03, true, true);
-									vocals.volume = 0;
-									daNote.tooLate = true;
-									daNote.destroy();
-								}
-						}
-					}
-				}
+				// 	if (daNote.prevNote.wasGoodHit)
+				// 	{
+				// 		switch (daNote.noteData)
+				// 		{
+				// 			case 0:
+				// 				if (!leftHold)
+				// 				{
+				// 					noteMiss(0, 0.03, true, true);
+				// 					vocals.volume = 0;
+				// 					daNote.tooLate = true;
+				// 					daNote.destroy();
+				// 				}
+				// 			case 1:
+				// 				if (!downHold)
+				// 				{
+				// 					noteMiss(1, 0.03, true, true);
+				// 					vocals.volume = 0;
+				// 					daNote.tooLate = true;
+				// 					daNote.destroy();
+				// 				}
+				// 			case 2:
+				// 				if (!upHold)
+				// 				{
+				// 					noteMiss(2, 0.03, true, true);
+				// 					vocals.volume = 0;
+				// 					daNote.tooLate = true;
+				// 					daNote.destroy();
+				// 				}
+				// 			case 3:
+				// 				if (!rightHold)
+				// 				{
+				// 					noteMiss(3, 0.03, true, true);
+				// 					vocals.volume = 0;
+				// 					daNote.tooLate = true;
+				// 					daNote.destroy();
+				// 				}
+				// 		}
+				// 	}
+				// }
 
 				if (Config.downscroll ? (daNote.y > strumLine.y + daNote.height + 50) : (daNote.y < strumLine.y - daNote.height - 50))
 				{
@@ -2754,7 +2779,7 @@ class PlayState extends MusicBeatState
 	function goodNoteHit(note:Note):Void
 	{
 		// Guitar Hero Styled Hold Notes
-		if (note.isSustainNote && !note.prevNote.wasGoodHit)
+		if (/*note.isSustainNote && !note.prevNote.wasGoodHit*/ false)
 		{
 			noteMiss(note.noteData, 0.05, true, true);
 			note.prevNote.tooLate = true;

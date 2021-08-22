@@ -65,8 +65,10 @@ class FreeplayState extends MusicBeatState
 		// if (StoryMenuState.weekUnlocked[6] || isDebug)
 		// 	addWeek(['Senpai', 'Roses', 'Thorns'], 6, ['senpai', 'senpai-angry', 'spirit']);
 
-		addWeek(["Dont-Mine-at-Night"], 4, ['steve']);
-		addWeek(["Super-Sonic-Racing"], 4, ['doll']);
+		addWeek(["Dont-Mine-at-Night"], 7, ['steve']);
+		addWeek(["Super-Sonic-Racing"], 7, ['doll']);
+		addWeek(["Rockslide-Rumble"], 7, ['crash']);
+		addWeek(["Break-My-Mind"], 7, ['doll']);
 
 		// LOAD MUSIC
 		/*for(x in songs){

@@ -17,5 +17,6 @@ senpai-angry
 spirit
 monkey
 steve
-crash
 doll
+crash
+nightmare

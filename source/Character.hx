@@ -30,6 +30,10 @@ class Character extends FlxSprite
 	public var modelScale:Float = 1;
 	public var modelSpeed:Map<String, Float> = new Map<String, Float>();
 	public var model:ModelThing;
+	public var noLoopList:Array<String> = [];
+	public var modelGloss:Float = 30;
+	public var modelSpecular:Float = 1;
+	public var modelType:String = "md2";
 
 	public var spinYaw:Bool = false;
 	public var spinYawVal:Int = 0;
@@ -48,7 +52,6 @@ class Character extends FlxSprite
 	public var initX:Float = 0;
 	public var initY:Float = 0;
 	public var initZ:Float = 0;
-	public var noLoopList:Array<String> = [];
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -66,27 +69,16 @@ class Character extends FlxSprite
 			case 'steve':
 				modelName = "steve";
 				modelScale = 30;
-				modelSpeed = ["default" => 126/75];
-				//modelSpeed = 126 / 75;
+				modelSpeed = ["default" => 126 / 75];
 				isModel = true;
 				loadGraphicFromSprite(Main.modelView.sprite);
-				// scale.x = scale.y = 1.4;
 				initYaw = -45;
 				initY = -28;
 				updateHitbox();
 				noLoopList = ["idle"];
-
-			// case 'crash':
-			// 	modelName = "crash";
-			// 	modelScale = 1;
-			// 	modelSpeed = 2;
-			// 	isModel = true;
-			// 	loadGraphicFromSprite(Main.modelView.sprite);
-			// 	// scale.x = scale.y = 1.4;
-			// 	initYaw = -45;
-			// 	initY = -80;
-			// 	updateHitbox();
-			// 	noLoopList = ["idle", "singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
+				Main.modelView.light.ambient = 1;
+				Main.modelView.light.specular = 0.5;
+				Main.modelView.light.diffuse = 0.5;
 
 			case 'doll':
 				modelName = "doll";
@@ -94,7 +86,35 @@ class Character extends FlxSprite
 				modelSpeed = ["default" => 1.66, "idle" => 1];
 				isModel = true;
 				loadGraphicFromSprite(Main.modelView.sprite);
-				// scale.x = scale.y = 1.4;
+				initYaw = -45;
+				updateHitbox();
+				noLoopList = ["singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
+				Main.modelView.light.ambient = 0.85;
+				Main.modelView.light.specular = 0;
+				Main.modelView.light.diffuse = 0;
+
+			case 'crash':
+				modelName = "crash";
+				modelScale = 15;
+				modelSpeed = ["default" => 2.6, "idle" => 1.8];
+				isModel = true;
+				loadGraphicFromSprite(Main.modelView.sprite);
+				initYaw = -45;
+				initZ = -25;
+				initY = -140;
+				updateHitbox();
+				noLoopList = ["idle", "singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
+				Main.modelView.light.ambient = 1;
+				Main.modelView.light.specular = 0;
+				Main.modelView.light.diffuse = 0;
+
+			case 'nightmare':
+				modelName = "hellknight";
+				modelType = "md5";
+				modelScale = 1;
+				modelSpeed = ["default" => 1];
+				isModel = true;
+				loadGraphicFromSprite(Main.modelView.sprite);
 				initYaw = -45;
 				updateHitbox();
 				noLoopList = ["singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
