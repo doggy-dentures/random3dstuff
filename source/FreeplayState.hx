@@ -40,10 +40,10 @@ class FreeplayState extends MusicBeatState
 
 		curSelected = 0;
 
-		for (i in 0...initSonglist.length)
-		{
-			songs.push(new SongMetadata(initSonglist[i], 1, 'gf'));
-		}
+		// for (i in 0...initSonglist.length)
+		// {
+		// 	songs.push(new SongMetadata(initSonglist[i], 1, 'gf'));
+		// }
 
 		var isDebug:Bool = true;
 
@@ -68,7 +68,7 @@ class FreeplayState extends MusicBeatState
 		addWeek(["Dont-Mine-at-Night"], 7, ['steve']);
 		addWeek(["Super-Sonic-Racing"], 7, ['doll']);
 		addWeek(["Rockslide-Rumble"], 7, ['crash']);
-		addWeek(["Break-My-Mind"], 7, ['doll']);
+		addWeek(["Break-My-Mind"], 7, ['endo']);
 
 		// LOAD MUSIC
 		/*for(x in songs){

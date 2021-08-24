@@ -8,3 +8,5 @@ school
 schoolEvil
 minecraft
 checker
+crashStage
+fnafStage

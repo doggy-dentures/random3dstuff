@@ -76,7 +76,7 @@ class ModelThing
 
 	public function new(type:String, fileName:String, _modelView:ModelView, _scale:Float = 1, _animSpeed:Map<String, Float> = null, _initYaw:Float = 0,
 			_initPitch:Float = 0, _initRoll:Float = 0, alpha:Float = 1.0, _initX:Float = 0, _initY:Float = 0, _initZ:Float = 0, list:Array<String>,
-			_gloss:Float, _specular:Float)
+			md5Anims:Map<String, String>)
 	{
 		modelType = type;
 
@@ -107,23 +107,30 @@ class ModelThing
 					trace("ERROR: MODEL OF NAME '" + fileName + ".md5mesh' CAN'T BE FOUND!");
 					return;
 				}
-				stateTransition = new CrossfadeTransition(0.5);
+				stateTransition = new CrossfadeTransition(0.15);
 				modelBytes = Assets.getBytes('assets/models/' + fileName + '/' + fileName + '.md5mesh');
 				animationMap = new Map<String, ByteArray>();
-				animationMap["idle"] = Assets.getBytes('assets/models/' + fileName + '/' + 'idle2.md5anim');
+				for (animName in md5Anims.keys())
+				{
+					if (!Assets.exists('assets/models/' + fileName + '/' + md5Anims[animName] + '.md5anim'))
+					{
+						trace("ERROR: MD5 ANIMATION OF NAME '" + md5Anims[animName] + ".md5anim' CAN'T BE FOUND!");
+						continue;
+					}
+					animationMap[animName] = Assets.getBytes('assets/models/' + fileName + '/' + md5Anims[animName] + '.md5anim');
+				}
 
 				Asset3DLibrary.addEventListener(Asset3DEvent.ASSET_COMPLETE, onAssetCompleteMD5);
 				Asset3DLibrary.addEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceCompleteMD5);
 				Asset3DLibrary.loadData(modelBytes, null, null, new MD5MeshParser());
 
-				modelMaterial = new TextureMaterial(Cast.bitmapTexture('assets/models/' + fileName + '/' + 'hellknight_diffuse.jpg'));
+				modelMaterial = new TextureMaterial(Cast.bitmapTexture('assets/models/' + fileName + '/' + fileName + '.png'));
 		}
 
 		modelView = _modelView;
 
 		modelMaterial.lightPicker = modelView.lightPicker;
-		modelMaterial.gloss = _gloss;
-		modelMaterial.specular = _specular;
+		modelMaterial.gloss = 30;
 		modelMaterial.specularMethod = new CelSpecularMethod();
 		modelMaterial.ambient = 1;
 		modelMaterial.shadowMethod = modelView.shadowMapMethod;
@@ -131,8 +138,8 @@ class ModelThing
 
 		if (modelType == 'md5')
 		{
-			modelMaterial.specularMap = Cast.bitmapTexture('assets/models/' + fileName + '/' + "hellknight_specular.png");
-			modelMaterial.normalMap = Cast.bitmapTexture('assets/models/' + fileName + '/' + "hellknight_normals.png");
+			// modelMaterial.specularMap = Cast.bitmapTexture('assets/models/' + fileName + '/' + "hellknight_specular.png");
+			// modelMaterial.normalMap = Cast.bitmapTexture('assets/models/' + fileName + '/' + "hellknight_normals.png");
 		}
 
 		scale = _scale;
@@ -213,6 +220,12 @@ class ModelThing
 			mesh = cast(event.asset, Mesh);
 			mesh.material = modelMaterial;
 			// mesh.castsShadows = true;
+			mesh.scaleX = scale;
+			mesh.scaleY = scale;
+			mesh.scaleZ = scale;
+			mesh.yaw(initYaw);
+			mesh.pitch(initPitch);
+			mesh.roll(initRoll);
 		}
 	}
 
@@ -279,6 +292,7 @@ class ModelThing
 								newSpeed = animSpeed[anim];
 							else
 								newSpeed = animSpeed["default"];
+							skeletonAnimator.playbackSpeed = newSpeed;
 							skeletonAnimator.play(anim, stateTransition, offset);
 							currentAnim = anim;
 						}

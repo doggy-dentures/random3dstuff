@@ -31,9 +31,8 @@ class Character extends FlxSprite
 	public var modelSpeed:Map<String, Float> = new Map<String, Float>();
 	public var model:ModelThing;
 	public var noLoopList:Array<String> = [];
-	public var modelGloss:Float = 30;
-	public var modelSpecular:Float = 1;
 	public var modelType:String = "md2";
+	public var md5Anims:Map<String, String> = new Map<String, String>();
 
 	public var spinYaw:Bool = false;
 	public var spinYawVal:Int = 0;
@@ -76,7 +75,7 @@ class Character extends FlxSprite
 				initY = -28;
 				updateHitbox();
 				noLoopList = ["idle"];
-				Main.modelView.light.ambient = 1;
+				Main.modelView.light.ambient = 0.8;
 				Main.modelView.light.specular = 0.5;
 				Main.modelView.light.diffuse = 0.5;
 
@@ -108,16 +107,25 @@ class Character extends FlxSprite
 				Main.modelView.light.specular = 0;
 				Main.modelView.light.diffuse = 0;
 
-			case 'nightmare':
-				modelName = "hellknight";
+			case 'endo':
+				modelName = "Collection";
 				modelType = "md5";
-				modelScale = 1;
-				modelSpeed = ["default" => 1];
+				modelScale = 25;
+				initYaw = -45;
+				initY = -115;
 				isModel = true;
 				loadGraphicFromSprite(Main.modelView.sprite);
-				initYaw = -45;
 				updateHitbox();
 				noLoopList = ["singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
+				md5Anims["idle"] = "Collection_11";
+				md5Anims["singUP"] = "Collection_4";
+				md5Anims["singLEFT"] = "Collection_17";
+				md5Anims["singDOWN"] = "Collection_6";
+				md5Anims["singRIGHT"] = "Collection_14";
+				modelSpeed = ["default" => 1, "singRIGHT" => 1.7, "singLEFT" => 2, "singUP" => 1.5, "singDOWN" => 1.5];
+				Main.modelView.light.ambient = 0.5;
+				Main.modelView.light.specular = 1;
+				Main.modelView.light.diffuse = 1;
 
 			case 'gf':
 				// GIRLFRIEND CODE
@@ -727,7 +735,7 @@ class Character extends FlxSprite
 		}
 		else if (isModel && (!debugMode || ignoreDebug))
 		{
-			playAnim('idle');
+			playAnim('idle', true, false);
 		}
 	}
 

@@ -83,6 +83,7 @@ class PlayState extends MusicBeatState
 	public static var minecraftSongs:Array<String>;
 	public static var checkerSongs:Array<String>;
 	public static var crashSongs:Array<String>;
+	public static var fnafSongs:Array<String>;
 
 	private var camFocus:String = "";
 	private var camTween:FlxTween;
@@ -243,6 +244,7 @@ class PlayState extends MusicBeatState
 		minecraftSongs = ["dont-mine-at-night"];
 		checkerSongs = ["super-sonic-racing"];
 		crashSongs = ["rockslide-rumble"];
+		fnafSongs = ["break-my-mind"];
 
 		canHit = !(Config.ghostTapType > 0);
 		noMissCount = 0;
@@ -319,6 +321,10 @@ class PlayState extends MusicBeatState
 			else if (crashSongs.contains(SONG.song.toLowerCase()))
 			{
 				stageCheck = 'crashStage';
+			}
+			else if (fnafSongs.contains(SONG.song.toLowerCase()))
+			{
+				stageCheck = 'fnafStage';
 			}
 
 			SONG.stage = stageCheck;
@@ -658,6 +664,18 @@ class PlayState extends MusicBeatState
 			bg.screenCenter(XY);
 			add(bg);
 		}
+		else if (stageCheck == 'fnafStage')
+		{
+			defaultCamZoom = 0.85;
+			curStage = 'fnafStage';
+			var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("bedroom"));
+			bg.antialiasing = true;
+			bg.active = false;
+			bg.setGraphicSize(Std.int(bg.width * 0.9));
+			bg.updateHitbox();
+			bg.screenCenter(XY);
+			add(bg);
+		}
 		else
 		{
 			defaultCamZoom = 0.9;
@@ -749,6 +767,8 @@ class PlayState extends MusicBeatState
 		gf.scrollFactor.set(0.95, 0.95);
 
 		dad = new Character(100, 100, SONG.player2);
+		if (dad.isModel)
+			dad.visible = false;
 
 		var camPos:FlxPoint = new FlxPoint(dad.getGraphicMidpoint().x, dad.getGraphicMidpoint().y);
 
@@ -796,6 +816,9 @@ class PlayState extends MusicBeatState
 				dad.yTween = FlxTween.tween(dad, {'y': dad.y + 100}, 1, {type: PINGPONG});
 			case 'crash':
 				dad.y += 80;
+			case 'endo':
+				dad.y += 80;
+				dad.x -= 100;
 		}
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
@@ -845,6 +868,13 @@ class PlayState extends MusicBeatState
 				gf.x -= 50;
 				dad.x -= 50;
 				boyfriend.x -= 50;
+			case 'fnafStage':
+				gf.y -= 50;
+				dad.y -= 50;
+				boyfriend.y -= 50;
+				gf.x += 80;
+				dad.x -= 80;
+				boyfriend.x += 80;
 		}
 
 		add(gf);
@@ -1558,14 +1588,18 @@ class PlayState extends MusicBeatState
 		if (dad.isModel && !dad.beganLoading)
 		{
 			dad.beganLoading = true;
-			dad.model = new ModelThing(dad.modelType, dad.modelName, Main.modelView, dad.modelScale, dad.modelSpeed, dad.initYaw, dad.initPitch, dad.initRoll, 1, dad.initX,
-				dad.initY, dad.initZ, dad.noLoopList, dad.modelGloss, dad.modelSpecular);
+			dad.model = new ModelThing(dad.modelType, dad.modelName, Main.modelView, dad.modelScale, dad.modelSpeed, dad.initYaw, dad.initPitch, dad.initRoll,
+				1, dad.initX, dad.initY, dad.initZ, dad.noLoopList, dad.md5Anims);
 			return;
 		}
 		else if (dad.isModel && dad.beganLoading && !dad.model.fullyLoaded)
 		{
 			return;
 		}
+
+		// if (dad.isModel && dad.model.fullyLoaded && dad.model.currentAnim != "")
+		// 	dad.visible = true;
+		dad.visible = true;
 
 		/*New keyboard input stuff. Disables the listener when using controller because controller uses the other input set thing I did.
 
@@ -1848,11 +1882,11 @@ class PlayState extends MusicBeatState
 
 					var altAnim:String = "";
 
-					if (SONG.notes[Math.floor(curStep / 16)] != null)
-					{
-						if (SONG.notes[Math.floor(curStep / 16)].altAnim)
-							altAnim = '-alt';
-					}
+					// if (SONG.notes[Math.floor(curStep / 16)] != null)
+					// {
+					// 	if (SONG.notes[Math.floor(curStep / 16)].altAnim)
+					// 		altAnim = '-alt';
+					// }
 
 					// trace("DA ALT THO?: " + SONG.notes[Math.floor(curStep / 16)].altAnim);
 
@@ -2972,16 +3006,20 @@ class PlayState extends MusicBeatState
 				Conductor.changeBPM(SONG.bpm);
 
 			// Dad doesnt interupt his own notes
-			if (SONG.notes[Math.floor(curStep / 16)].mustHitSection)
+			var goodTime = (dad.isModel ? !dad.model.currentAnim.contains('sing') : !dad.animation.curAnim.name.contains('sing'));
+			if (goodTime)
 			{
-				if (dadBeats.contains(curBeat % 4) && dad.canAutoAnim)
-					dad.dance();
-			}
-			else if (!SONG.notes[Math.floor(curStep / 16)].mustHitSection)
-			{
-				if (dadBeats.contains(curBeat % 4) && dad.canAutoAnim)
-					if (dad.isModel && dad.model != null && dad.model.currentAnim.contains('idle'))
+				if (SONG.notes[Math.floor(curStep / 16)].mustHitSection)
+				{
+					if (dadBeats.contains(curBeat % 4) && dad.canAutoAnim)
 						dad.dance();
+				}
+				else if (!SONG.notes[Math.floor(curStep / 16)].mustHitSection)
+				{
+					if (dadBeats.contains(curBeat % 4) && dad.canAutoAnim)
+						if (dad.isModel && dad.model != null && dad.model.currentAnim.contains('idle'))
+							dad.dance();
+				}
 			}
 		}
 		else

@@ -41,10 +41,10 @@ class HealthIcon extends FlxSprite
 			animation.add('gf-car', [16, 49, 35], 0, false, isPlayer);
 			animation.add('gf-pixel', [16, 49, 35], 0, false, isPlayer);
 			animation.add('monkey', [10, 11, 38], 0, false, isPlayer);
-			animation.add('steve', [10, 11, 38], 0, false, isPlayer);
-			animation.add('doll', [10, 11, 38], 0, false, isPlayer);
-			animation.add('crash', [10, 11, 38], 0, false, isPlayer);
-			animation.add('nightmare', [10, 11, 38], 0, false, isPlayer);
+			animation.add('steve', [54, 55, 53], 0, false, isPlayer);
+			animation.add('doll', [56, 57, 58], 0, false, isPlayer);
+			animation.add('crash', [59, 60, 61], 0, false, isPlayer);
+			animation.add('endo', [10, 11, 38], 0, false, isPlayer);
 			
 		}
 		else{
@@ -72,10 +72,10 @@ class HealthIcon extends FlxSprite
 			animation.add('monster', [19, 20], 0, false, isPlayer);
 			animation.add('monster-christmas', [19, 20], 0, false, isPlayer);
 			animation.add('monkey', [10, 11], 0, false, isPlayer);
-			animation.add('steve', [10, 11, 38], 0, false, isPlayer);
-			animation.add('doll', [10, 11, 38], 0, false, isPlayer);
-			animation.add('crash', [10, 11, 38], 0, false, isPlayer);
-			animation.add('nightmare', [10, 11, 38], 0, false, isPlayer);
+			animation.add('steve', [10, 11], 0, false, isPlayer);
+			animation.add('doll', [10, 11], 0, false, isPlayer);
+			animation.add('crash', [10, 11], 0, false, isPlayer);
+			animation.add('endo', [10, 11], 0, false, isPlayer);
 		}
 
 		iconSize = width;
