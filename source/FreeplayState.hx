@@ -69,6 +69,7 @@ class FreeplayState extends MusicBeatState
 		addWeek(["Super-Sonic-Racing"], 7, ['doll']);
 		addWeek(["Rockslide-Rumble"], 7, ['crash']);
 		addWeek(["Break-My-Mind"], 7, ['endo']);
+		addWeek(["Spooky-Scary-Skeletons"], 7, ['skeleton']);
 
 		// LOAD MUSIC
 		/*for(x in songs){

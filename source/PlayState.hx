@@ -1,5 +1,8 @@
 package;
 
+import sys.io.FileOutput;
+import openfl.geom.Rectangle;
+import openfl.utils.ByteArray;
 import flixel.util.FlxDestroyUtil;
 import haxe.display.Display.EnumFieldOriginKind;
 import openfl.filters.ColorMatrixFilter;
@@ -84,6 +87,7 @@ class PlayState extends MusicBeatState
 	public static var checkerSongs:Array<String>;
 	public static var crashSongs:Array<String>;
 	public static var fnafSongs:Array<String>;
+	public static var skeletonSongs:Array<String>;
 
 	private var camFocus:String = "";
 	private var camTween:FlxTween;
@@ -245,6 +249,7 @@ class PlayState extends MusicBeatState
 		checkerSongs = ["super-sonic-racing"];
 		crashSongs = ["rockslide-rumble"];
 		fnafSongs = ["break-my-mind"];
+		skeletonSongs = ["spooky-scary-skeletons"];
 
 		canHit = !(Config.ghostTapType > 0);
 		noMissCount = 0;
@@ -325,6 +330,10 @@ class PlayState extends MusicBeatState
 			else if (fnafSongs.contains(SONG.song.toLowerCase()))
 			{
 				stageCheck = 'fnafStage';
+			}
+			else if (skeletonSongs.contains(SONG.song.toLowerCase()))
+			{
+				stageCheck = 'skeletonStage';
 			}
 
 			SONG.stage = stageCheck;
@@ -676,6 +685,16 @@ class PlayState extends MusicBeatState
 			bg.screenCenter(XY);
 			add(bg);
 		}
+		else if (stageCheck == 'skeletonStage')
+		{
+			defaultCamZoom = 0.8;
+			curStage = 'skeletonStage';
+			var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("darkness"));
+			bg.antialiasing = true;
+			bg.active = false;
+			bg.screenCenter(XY);
+			add(bg);
+		}
 		else
 		{
 			defaultCamZoom = 0.9;
@@ -819,6 +838,8 @@ class PlayState extends MusicBeatState
 			case 'endo':
 				dad.y += 80;
 				dad.x -= 100;
+			case 'skeleton':
+				dad.y += 170;
 		}
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
@@ -983,59 +1004,59 @@ class PlayState extends MusicBeatState
 		// UI_camera.zoom = 1;
 
 		// cameras = [FlxG.cameras.list[1]];
-		startingSong = true;
+		// startingSong = true;
 
-		if (isStoryMode)
-		{
-			switch (curSong.toLowerCase())
-			{
-				case "winter-horrorland":
-					var blackScreen:FlxSprite = new FlxSprite(0, 0).makeGraphic(Std.int(FlxG.width * 2), Std.int(FlxG.height * 2), FlxColor.BLACK);
-					add(blackScreen);
-					blackScreen.scrollFactor.set();
-					camHUD.visible = false;
+		// if (isStoryMode)
+		// {
+		// 	switch (curSong.toLowerCase())
+		// 	{
+		// 		case "winter-horrorland":
+		// 			var blackScreen:FlxSprite = new FlxSprite(0, 0).makeGraphic(Std.int(FlxG.width * 2), Std.int(FlxG.height * 2), FlxColor.BLACK);
+		// 			add(blackScreen);
+		// 			blackScreen.scrollFactor.set();
+		// 			camHUD.visible = false;
 
-					new FlxTimer().start(0.1, function(tmr:FlxTimer)
-					{
-						remove(blackScreen);
-						FlxG.sound.play('assets/sounds/Lights_Turn_On' + TitleState.soundExt);
-						camFollow.y = -2050;
-						camFollow.x += 200;
-						FlxG.camera.focusOn(camFollow.getPosition());
-						FlxG.camera.zoom = 1.5;
+		// 			new FlxTimer().start(0.1, function(tmr:FlxTimer)
+		// 			{
+		// 				remove(blackScreen);
+		// 				FlxG.sound.play('assets/sounds/Lights_Turn_On' + TitleState.soundExt);
+		// 				camFollow.y = -2050;
+		// 				camFollow.x += 200;
+		// 				FlxG.camera.focusOn(camFollow.getPosition());
+		// 				FlxG.camera.zoom = 1.5;
 
-						new FlxTimer().start(0.8, function(tmr:FlxTimer)
-						{
-							camHUD.visible = true;
-							remove(blackScreen);
-							FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2.5, {
-								ease: FlxEase.quadInOut,
-								onComplete: function(twn:FlxTween)
-								{
-									startCountdown();
-								}
-							});
-						});
-					});
-				case 'senpai':
-					schoolIntro(doof);
-				case 'roses':
-					FlxG.sound.play('assets/sounds/ANGRY' + TitleState.soundExt);
-					schoolIntro(doof);
-				case 'thorns':
-					schoolIntro(doof);
-				default:
-					startCountdown();
-			}
-		}
-		else
-		{
-			switch (curSong.toLowerCase())
-			{
-				default:
-					startCountdown();
-			}
-		}
+		// 				new FlxTimer().start(0.8, function(tmr:FlxTimer)
+		// 				{
+		// 					camHUD.visible = true;
+		// 					remove(blackScreen);
+		// 					FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2.5, {
+		// 						ease: FlxEase.quadInOut,
+		// 						onComplete: function(twn:FlxTween)
+		// 						{
+		// 							startCountdown();
+		// 						}
+		// 					});
+		// 				});
+		// 			});
+		// 		case 'senpai':
+		// 			schoolIntro(doof);
+		// 		case 'roses':
+		// 			FlxG.sound.play('assets/sounds/ANGRY' + TitleState.soundExt);
+		// 			schoolIntro(doof);
+		// 		case 'thorns':
+		// 			schoolIntro(doof);
+		// 		default:
+		// 			startCountdown();
+		// 	}
+		// }
+		// else
+		// {
+		// 	switch (curSong.toLowerCase())
+		// 	{
+		// 		default:
+		// 			startCountdown();
+		// 	}
+		// }
 
 		// FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		// FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
@@ -1143,6 +1164,11 @@ class PlayState extends MusicBeatState
 
 	function startCountdown():Void
 	{
+		if (startedCountdown)
+			return;
+		if (dad.isModel)
+			dad.visible = true;
+		startingSong = true;
 		inCutscene = false;
 
 		healthBar.visible = true;
@@ -1597,9 +1623,8 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		// if (dad.isModel && dad.model.fullyLoaded && dad.model.currentAnim != "")
-		// 	dad.visible = true;
-		dad.visible = true;
+		if (!startedCountdown)
+			startCountdown();
 
 		/*New keyboard input stuff. Disables the listener when using controller because controller uses the other input set thing I did.
 
@@ -1953,53 +1978,53 @@ class PlayState extends MusicBeatState
 				}
 
 				// Guitar Hero Type Held Notes
-				// if (daNote.isSustainNote && daNote.mustPress)
-				// {
-				// 	if (daNote.prevNote.tooLate)
-				// 	{
-				// 		daNote.tooLate = true;
-				// 		daNote.destroy();
-				// 	}
+				if (daNote.isSustainNote && daNote.mustPress)
+				{
+					if (daNote.prevNote.tooLate)
+					{
+						daNote.tooLate = true;
+						daNote.destroy();
+					}
 
-				// 	if (daNote.prevNote.wasGoodHit)
-				// 	{
-				// 		switch (daNote.noteData)
-				// 		{
-				// 			case 0:
-				// 				if (!leftHold)
-				// 				{
-				// 					noteMiss(0, 0.03, true, true);
-				// 					vocals.volume = 0;
-				// 					daNote.tooLate = true;
-				// 					daNote.destroy();
-				// 				}
-				// 			case 1:
-				// 				if (!downHold)
-				// 				{
-				// 					noteMiss(1, 0.03, true, true);
-				// 					vocals.volume = 0;
-				// 					daNote.tooLate = true;
-				// 					daNote.destroy();
-				// 				}
-				// 			case 2:
-				// 				if (!upHold)
-				// 				{
-				// 					noteMiss(2, 0.03, true, true);
-				// 					vocals.volume = 0;
-				// 					daNote.tooLate = true;
-				// 					daNote.destroy();
-				// 				}
-				// 			case 3:
-				// 				if (!rightHold)
-				// 				{
-				// 					noteMiss(3, 0.03, true, true);
-				// 					vocals.volume = 0;
-				// 					daNote.tooLate = true;
-				// 					daNote.destroy();
-				// 				}
-				// 		}
-				// 	}
-				// }
+					if (daNote.prevNote.wasGoodHit)
+					{
+						switch (daNote.noteData)
+						{
+							case 0:
+								if (!leftHold)
+								{
+									noteMiss(0, 0.03, true, true);
+									vocals.volume = 0;
+									daNote.tooLate = true;
+									daNote.destroy();
+								}
+							case 1:
+								if (!downHold)
+								{
+									noteMiss(1, 0.03, true, true);
+									vocals.volume = 0;
+									daNote.tooLate = true;
+									daNote.destroy();
+								}
+							case 2:
+								if (!upHold)
+								{
+									noteMiss(2, 0.03, true, true);
+									vocals.volume = 0;
+									daNote.tooLate = true;
+									daNote.destroy();
+								}
+							case 3:
+								if (!rightHold)
+								{
+									noteMiss(3, 0.03, true, true);
+									vocals.volume = 0;
+									daNote.tooLate = true;
+									daNote.destroy();
+								}
+						}
+					}
+				}
 
 				if (Config.downscroll ? (daNote.y > strumLine.y + daNote.height + 50) : (daNote.y < strumLine.y - daNote.height - 50))
 				{
@@ -2030,6 +2055,11 @@ class PlayState extends MusicBeatState
 		upRelease = false;
 		rightPress = false;
 		rightRelease = false;
+
+		// if (FlxG.keys.justPressed.Q)
+		// {
+		// 	Main.modelView.thingy = true;
+		// }
 	}
 
 	public function endSong():Void

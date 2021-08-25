@@ -1,12 +1,6 @@
 stage
-spooky
-philly
-limo
-mall
-mallEvil
-school
-schoolEvil
 minecraft
 checker
 crashStage
 fnafStage
+skeletonStage

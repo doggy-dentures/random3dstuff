@@ -75,9 +75,9 @@ class Character extends FlxSprite
 				initY = -28;
 				updateHitbox();
 				noLoopList = ["idle"];
-				Main.modelView.light.ambient = 0.8;
-				Main.modelView.light.specular = 0.5;
-				Main.modelView.light.diffuse = 0.5;
+				Main.modelView.light.ambient = 1;
+				Main.modelView.light.specular = 0.0;
+				Main.modelView.light.diffuse = 0.0;
 
 			case 'doll':
 				modelName = "doll";
@@ -88,7 +88,7 @@ class Character extends FlxSprite
 				initYaw = -45;
 				updateHitbox();
 				noLoopList = ["singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
-				Main.modelView.light.ambient = 0.85;
+				Main.modelView.light.ambient = 1;
 				Main.modelView.light.specular = 0;
 				Main.modelView.light.diffuse = 0;
 
@@ -123,6 +123,21 @@ class Character extends FlxSprite
 				md5Anims["singDOWN"] = "Collection_6";
 				md5Anims["singRIGHT"] = "Collection_14";
 				modelSpeed = ["default" => 1, "singRIGHT" => 1.7, "singLEFT" => 2, "singUP" => 1.5, "singDOWN" => 1.5];
+				Main.modelView.light.ambient = 0.5;
+				Main.modelView.light.specular = 1;
+				Main.modelView.light.diffuse = 1;
+			
+			case 'skeleton':
+				modelName = "skeleton";
+				modelType = "awd";
+				modelScale = 150;
+				initYaw = 90;
+				initY = 50;
+				isModel = true;
+				loadGraphicFromSprite(Main.modelView.sprite);
+				updateHitbox();
+				noLoopList = ["singUP", 'singLEFT', 'singDOWN', 'singRIGHT'];
+				modelSpeed = ["default" => 1];
 				Main.modelView.light.ambient = 0.5;
 				Main.modelView.light.specular = 1;
 				Main.modelView.light.diffuse = 1;

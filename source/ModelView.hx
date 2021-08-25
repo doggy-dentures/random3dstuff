@@ -1,5 +1,6 @@
 package;
 
+import sys.io.FileOutput;
 import flixel.FlxSprite;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxG;
@@ -30,37 +31,37 @@ import openfl.Vector;
 
 class ModelView
 {
-	//DD: Engine vars
+	// DD: Engine vars
 	public var view:View3D;
 	public var cameraController:HoverController;
+
 	private var _lookAtPosition:Vector3D = new Vector3D();
-	
+
 	// #if debug
 	// //DD: Stat tracking
 	// private var stats:AwayStats;
 	// #end
-
-	//DD: Light objects
+	// DD: Light objects
 	public var light:DirectionalLight;
 
 	public var lightPicker:StaticLightPicker;
 	public var shadowMapMethod:FilteredShadowMapMethod;
 
-	//DD: The Flixel objects the engine will use
+	// DD: The Flixel objects the engine will use
 	private var bmd:BitmapData;
 	public var sprite:FlxSprite = new FlxSprite();
-	
-	//DD: Track models added if we want to remove them later
+
+	// DD: Track models added if we want to remove them later
 	public var addedModels:Array<ModelThing> = [];
 
 	public function new()
 	{
-		//DD: Setup 3d viewing object thing
+		// DD: Setup 3d viewing object thing
 		view = new View3D();
 
 		view.width = 720;
 		view.height = 720;
-		
+
 		FlxG.addChildBelowMouse(view);
 
 		view.camera.lens.far = 5000;
@@ -70,6 +71,9 @@ class ModelView
 		light = new DirectionalLight(-0.5, -1, -1);
 		lightPicker = new StaticLightPicker([light]);
 		view.scene.addChild(light);
+		light.ambient = 1;
+		light.specular = 1;
+		light.diffuse = 1;
 
 		shadowMapMethod = new FilteredShadowMapMethod(light);
 
@@ -79,8 +83,9 @@ class ModelView
 
 		bmd = new BitmapData(Std.int(view.width), Std.int(view.height), true, 0x0);
 		sprite.loadGraphic(bmd);
-
 	}
+
+	// public var thingy = false;
 
 	public function update()
 	{
@@ -89,7 +94,7 @@ class ModelView
 		// i.e. 3D stuff is never visible if 2D stuff is there too
 		// So we gotta turn the 3D into 2D for it to actually show up
 
-		//DD: We gotta set the alpha to 0 then back to 1 for some reason or else transparency doesn't work
+		// DD: We gotta set the alpha to 0 then back to 1 for some reason or else transparency doesn't work
 		view.backgroundAlpha = 0;
 		view.renderer.queueSnapshot(bmd);
 		view.render();
@@ -97,6 +102,16 @@ class ModelView
 
 		sprite.loadGraphic(bmd);
 		sprite.graphic.persist = true;
+
+		// if (thingy)
+		// {
+		// 	var b:ByteArray = new ByteArray();
+		// 	b = bmd.encode(new Rectangle(0, 0, view.width, view.height), new openfl.display.PNGEncoderOptions());
+		// 	var fo:FileOutput = sys.io.File.write("test.png", true);
+		// 	fo.writeBytes(b, 0, b.length);
+		// 	fo.close();
+		// 	thingy = false;
+		// }
 	}
 
 	public function addModel(model:Mesh)

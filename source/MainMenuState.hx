@@ -28,7 +28,7 @@ class MainMenuState extends MusicBeatState
 	//var configText:FlxText;
 	//var configSelected:Int = 0;
 	
-	var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', "options"];
+	var optionShit:Array<String> = ['freeplay', 'donate', "options"];
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;

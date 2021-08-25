@@ -42,14 +42,14 @@ class ModelThing
 
 	private var scale:Float;
 
-	// MD2
+	// DD: vertex animations (MD2)
 	public var animationSet:VertexAnimationSet;
 
 	private var vertexAnimator:VertexAnimator;
 
-	// MD5
+	// DD: Skeleton animations (MD5/AWD)
 	private var skeletonAnimator:SkeletonAnimator;
-	private var animationSetMD5:SkeletonAnimationSet;
+	private var animationSetSkeleton:SkeletonAnimationSet;
 	private var stateTransition:CrossfadeTransition;
 	private var skeleton:Skeleton;
 	private var animationMap:Map<String, ByteArray>;
@@ -125,6 +125,27 @@ class ModelThing
 				Asset3DLibrary.loadData(modelBytes, null, null, new MD5MeshParser());
 
 				modelMaterial = new TextureMaterial(Cast.bitmapTexture('assets/models/' + fileName + '/' + fileName + '.png'));
+
+			case 'awd':
+				if (!Assets.exists('assets/models/' + fileName + '/' + fileName + '.awd'))
+				{
+					trace("ERROR: MODEL OF NAME '" + fileName + ".awd' CAN'T BE FOUND!");
+					return;
+				}
+				stateTransition = new CrossfadeTransition(0.15);
+				modelBytes = Assets.getBytes('assets/models/' + fileName + '/' + fileName + '.awd');
+
+				Asset3DLibrary.enableParser(AWDParser);
+				Asset3DLibrary.addEventListener(Asset3DEvent.ASSET_COMPLETE, onAssetCompleteAWD);
+				Asset3DLibrary.addEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceCompleteAWD);
+				Asset3DLibrary.loadData(modelBytes);
+
+				if (!Assets.exists('assets/models/' + fileName + '/' + fileName + '.png'))
+				{
+					trace("ERROR: TEXTURE OF NAME '" + fileName + "'.png CAN'T BE FOUND!");
+					return;
+				}
+				modelMaterial = new TextureMaterial(Cast.bitmapTexture('assets/models/' + fileName + '/' + fileName + '.png'));
 		}
 
 		modelView = _modelView;
@@ -133,14 +154,8 @@ class ModelThing
 		modelMaterial.gloss = 30;
 		modelMaterial.specularMethod = new CelSpecularMethod();
 		modelMaterial.ambient = 1;
-		modelMaterial.shadowMethod = modelView.shadowMapMethod;
+		// modelMaterial.shadowMethod = modelView.shadowMapMethod;
 		modelMaterial.alpha = alpha;
-
-		if (modelType == 'md5')
-		{
-			// modelMaterial.specularMap = Cast.bitmapTexture('assets/models/' + fileName + '/' + "hellknight_specular.png");
-			// modelMaterial.normalMap = Cast.bitmapTexture('assets/models/' + fileName + '/' + "hellknight_normals.png");
-		}
 
 		scale = _scale;
 		if (_animSpeed == null)
@@ -188,7 +203,6 @@ class ModelThing
 		// vertexAnimator.playbackSpeed = animSpeed["default"];
 		mesh.animator = vertexAnimator;
 
-		fullyLoaded = true;
 		render(xOffset, yOffset, zOffset);
 	}
 
@@ -199,17 +213,16 @@ class ModelThing
 			var node:SkeletonClipNode = cast(event.asset, SkeletonClipNode);
 			var name:String = event.asset.assetNamespace;
 			node.name = name;
-			animationSetMD5.addAnimation(node);
+			animationSetSkeleton.addAnimation(node);
 			if (noLoopList.contains(node.name))
 				node.looping = false;
 		}
 		else if (event.asset.assetType == Asset3DType.ANIMATION_SET)
 		{
-			animationSetMD5 = cast(event.asset, SkeletonAnimationSet);
-			skeletonAnimator = new SkeletonAnimator(animationSetMD5, skeleton);
+			animationSetSkeleton = cast(event.asset, SkeletonAnimationSet);
+			skeletonAnimator = new SkeletonAnimator(animationSetSkeleton, skeleton);
 			for (name in animationMap.keys())
 				Asset3DLibrary.loadData(animationMap[name], null, name, new MD5AnimParser());
-			mesh.animator = skeletonAnimator;
 		}
 		else if (event.asset.assetType == Asset3DType.SKELETON)
 		{
@@ -231,15 +244,42 @@ class ModelThing
 
 	private function onResourceCompleteMD5(event:LoaderEvent):Void
 	{
-		if (skeletonAnimator == null)
-			trace('WTF LAME');
-		if (animationSetMD5 == null)
-			trace('WTF LAME2');
-		if (mesh == null)
-			trace('WTF LAME3');
-		if (skeleton == null)
-			trace('WTF LAME4');
-		fullyLoaded = true;
+		mesh.animator = skeletonAnimator;
+		render(xOffset, yOffset, zOffset);
+	}
+
+	private function onAssetCompleteAWD(event:Asset3DEvent):Void
+	{
+		if (event.asset.assetType == Asset3DType.SKELETON)
+		{
+			skeleton = cast(event.asset, Skeleton);
+			animationSetSkeleton = new SkeletonAnimationSet();
+			skeletonAnimator = new SkeletonAnimator(animationSetSkeleton, cast(event.asset, Skeleton), true);
+		}
+		else if (event.asset.assetType == Asset3DType.ANIMATION_NODE)
+		{
+			var node:SkeletonClipNode = cast(event.asset, SkeletonClipNode);
+			animationSetSkeleton.addAnimation(node);
+			if (noLoopList.contains(node.name))
+				node.looping = false;
+		}
+		else if (event.asset.assetType == Asset3DType.MESH)
+		{
+			mesh = cast(event.asset, Mesh);
+			mesh.material = modelMaterial;
+			// mesh.castsShadows = true;
+			mesh.scaleX = scale;
+			mesh.scaleY = scale;
+			mesh.scaleZ = scale;
+			mesh.yaw(initYaw);
+			mesh.pitch(initPitch);
+			mesh.roll(initRoll);
+		}
+	}
+
+	private function onResourceCompleteAWD(event:LoaderEvent):Void
+	{
+		mesh.animator = skeletonAnimator;
 		render(xOffset, yOffset, zOffset);
 	}
 
@@ -255,6 +295,7 @@ class ModelThing
 		}
 		modelView.addModel(mesh);
 		modelView.addedModels.push(this);
+		fullyLoaded = true;
 		playAnim("idle");
 	}
 
@@ -283,7 +324,7 @@ class ModelThing
 					else
 						trace("ANIMATION NAME " + anim + " NOT FOUND.");
 				case 'md5':
-					if (animationSetMD5.animationNames.indexOf(anim) != -1)
+					if (animationSetSkeleton.animationNames.indexOf(anim) != -1)
 					{
 						if (force || currentAnim != anim)
 						{
@@ -292,6 +333,28 @@ class ModelThing
 								newSpeed = animSpeed[anim];
 							else
 								newSpeed = animSpeed["default"];
+							skeletonAnimator.playbackSpeed = newSpeed;
+							skeletonAnimator.play(anim, stateTransition, offset);
+							currentAnim = anim;
+						}
+					}
+					else
+						trace("ANIMATION NAME " + anim + " NOT FOUND.");
+				case 'awd':
+					if (animationSetSkeleton.animationNames.indexOf(anim) != -1)
+					{
+						if (force || currentAnim != anim)
+						{
+							var newSpeed:Float = 1.0;
+							if (animSpeed.exists(anim))
+								newSpeed = animSpeed[anim];
+							else
+								newSpeed = animSpeed["default"];
+							if (skeletonAnimator == null)
+							{
+								trace("WTF LAME");
+								return;
+							}
 							skeletonAnimator.playbackSpeed = newSpeed;
 							skeletonAnimator.play(anim, stateTransition, offset);
 							currentAnim = anim;
@@ -315,8 +378,8 @@ class ModelThing
 		// 	modelMaterial.dispose();
 		if (animationSet != null)
 			animationSet.dispose();
-		if (animationSetMD5 != null)
-			animationSetMD5.dispose();
+		if (animationSetSkeleton != null)
+			animationSetSkeleton.dispose();
 		if (skeleton != null)
 			skeleton.dispose();
 		if (skeletonAnimator != null)
@@ -333,6 +396,8 @@ class ModelThing
 		Asset3DLibrary.removeEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceComplete);
 		Asset3DLibrary.removeEventListener(Asset3DEvent.ASSET_COMPLETE, onAssetCompleteMD5);
 		Asset3DLibrary.removeEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceCompleteMD5);
+		Asset3DLibrary.removeEventListener(Asset3DEvent.ASSET_COMPLETE, onAssetCompleteAWD);
+		Asset3DLibrary.removeEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceCompleteAWD);
 	}
 
 	public function addYaw(angle:Float)

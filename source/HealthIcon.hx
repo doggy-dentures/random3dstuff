@@ -45,6 +45,7 @@ class HealthIcon extends FlxSprite
 			animation.add('doll', [56, 57, 58], 0, false, isPlayer);
 			animation.add('crash', [59, 60, 61], 0, false, isPlayer);
 			animation.add('endo', [10, 11, 38], 0, false, isPlayer);
+			animation.add('skeleton', [62, 63, 64], 0, false, isPlayer);
 			
 		}
 		else{
@@ -72,10 +73,11 @@ class HealthIcon extends FlxSprite
 			animation.add('monster', [19, 20], 0, false, isPlayer);
 			animation.add('monster-christmas', [19, 20], 0, false, isPlayer);
 			animation.add('monkey', [10, 11], 0, false, isPlayer);
-			animation.add('steve', [10, 11], 0, false, isPlayer);
-			animation.add('doll', [10, 11], 0, false, isPlayer);
-			animation.add('crash', [10, 11], 0, false, isPlayer);
+			animation.add('steve', [30, 31], 0, false, isPlayer);
+			animation.add('doll', [24, 25], 0, false, isPlayer);
+			animation.add('crash', [26, 27], 0, false, isPlayer);
 			animation.add('endo', [10, 11], 0, false, isPlayer);
+			animation.add('skeleton', [28, 29], 0, false, isPlayer);
 		}
 
 		iconSize = width;
