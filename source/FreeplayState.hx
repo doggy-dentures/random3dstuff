@@ -22,7 +22,7 @@ class FreeplayState extends MusicBeatState
 	static var curDifficulty:Int = 1;
 
 	var scoreText:FlxText;
-	var diffText:FlxText;
+	// var diffText:FlxText;
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
 
@@ -112,14 +112,14 @@ class FreeplayState extends MusicBeatState
 		scoreBG.alpha = 0.6;
 		add(scoreBG);
 
-		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
-		diffText.font = scoreText.font;
-		add(diffText);
+		// diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
+		// diffText.font = scoreText.font;
+		// add(diffText);
 
 		add(scoreText);
 
 		changeSelection(startingSelection);
-		changeDiff();
+		// changeDiff();
 
 		// FlxG.sound.playMusic(Paths.music('title'), 0);
 		// FlxG.sound.music.fadeIn(2, 0, 0.8);
@@ -191,10 +191,10 @@ class FreeplayState extends MusicBeatState
 			changeSelection(1);
 		}
 
-		if (controls.LEFT_P)
-			changeDiff(-1);
-		if (controls.RIGHT_P)
-			changeDiff(1);
+		// if (controls.LEFT_P)
+		// 	changeDiff(-1);
+		// if (controls.RIGHT_P)
+		// 	changeDiff(1);
 
 		if (controls.BACK)
 		{
@@ -219,29 +219,29 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
-	function changeDiff(change:Int = 0)
-	{
-		curDifficulty += change;
+	// function changeDiff(change:Int = 0)
+	// {
+	// 	curDifficulty += change;
 
-		if (curDifficulty < 0)
-			curDifficulty = 2;
-		if (curDifficulty > 2)
-			curDifficulty = 0;
+	// 	if (curDifficulty < 0)
+	// 		curDifficulty = 2;
+	// 	if (curDifficulty > 2)
+	// 		curDifficulty = 0;
 
-		#if !switch
-		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
-		#end
+	// 	#if !switch
+	// 	intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
+	// 	#end
 
-		switch (curDifficulty)
-		{
-			case 0:
-				diffText.text = "EASY";
-			case 1:
-				diffText.text = 'NORMAL';
-			case 2:
-				diffText.text = "HARD";
-		}
-	}
+	// 	switch (curDifficulty)
+	// 	{
+	// 		case 0:
+	// 			diffText.text = "EASY";
+	// 		case 1:
+	// 			diffText.text = 'NORMAL';
+	// 		case 2:
+	// 			diffText.text = "HARD";
+	// 	}
+	// }
 
 	function changeSelection(change:Int = 0)
 	{
